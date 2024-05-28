@@ -10,15 +10,29 @@ connect.then((db)=>{
     // });
     // newDish.save()
     Dishes.create({
-        name: 'bún đậu mắm tôm ',
-        description : 'món ngon từ mắm tôm '
+        name: 'bún đậu mắm tôm 9',
+        description : 'món ngon từ mắm tôm 1'
     })
     .then((dish)=>{
         console.log(dish);
-        return Dishes.find({}).exec();
+        return Dishes.findByIdAndUpdate(dish._id,{
+            $set:{description: 'không có mắm tôm thì vứt '}
+        },{
+            new:true
+        })
+        .exec();
     })
-    .then((dishes)=>{
-        console.log(dishes);
+    .then((dish)=>{
+        console.log(dish);
+        dish.comments.push({
+            rating:4,
+            comment:'ngon đấy',
+            author:'thái dương'
+        });
+        return dish.save();
+    })
+    .then((dish)=>{
+        console.log(dish);
         // return Dishes.deleteMany({});
     })
     .then(()=>{
