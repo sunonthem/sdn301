@@ -1,65 +1,40 @@
-const express = require('express'), http = require('http');
+const express = require('express');
+const http = require('http');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
+const dishRouter = require('./routers/dishRouter');
+const genreRouter = require('./routers/genreRouter');
+const authorRouter = require('./routers/authorRouter');
+const bookRouter = require('./routers/bookRouter');
+const Dishes = require('./models/dishes');
+
 const hostname = 'localhost';
-const port = 5000;
+const port = 6000;
 const app = express();
-const bodyParser = require('body-parser');
-const dishRouter= require('./routers/dishRouter');
+
+const url = 'mongodb://127.0.0.1:27017/conFusion';
+const connect = mongoose.connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+connect.then(() => {
+    console.log("Connected correctly to server");
+}, (err) => { 
+    console.log('Error connecting to MongoDB:', err); 
+});
+
 app.use(morgan('dev'));
-// app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public'));
 
-app.use(bodyParser.json());
+app.use(express.json()); // Replaces body-parser
 
-// app.use((req, res, next) => {
-//     console.log(req.headers);
-//     res.statusCode = 200;
-//     res.setHeader('Content-Type', 'text/html');
-//     res.end('<html><body><h1>This is an Express Server</h1></body></html>');
-// })
+app.use('/book', bookRouter);
+app.use('/author', authorRouter);
+app.use('/genre', genreRouter);
+app.use('/dishes', dishRouter);
 
-app.all('/dishes', (req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
-})
-
-// app.get('/dishes', (req, res, next) => {
-    
-//     res.end('Will send all the dishes to you!'+req.body.name);
-// });
-
-// app.post('/dishes', (req, res, next) => {
-//     res.end('Will add the dish: ' + req.body.name + ' with details: ' + req.body.description);
-// });
-
-// app.put('/dishes', (req, res, next) => {
-//     res.statusCode = 403;
-//     res.end('PUT operation not supported on /dishes');
-// });
-
-// app.delete('/dishes', (req, res, next) => {
-//     res.end('Deleting all dishes');
-// });
-
-// app.get('/dishes/:dishId', (req, res, next) => {
-//     res.end('Will send details of the dish: ' + req.params.dishId + ' to you!');
-// });
-// app.post('/dishes/:dishId', (req, res, next) => {
-//     res.statusCode = 403;
-//     res.end('POST operation not supported on /dishes/' + req.params.dishId);
-// });
-
-// app.put('/dishes/:dishId', (req, res, next) => {
-//     res.write('Updating the dish: ' + req.params.dishId + '\n');
-//     res.end('Will update the dish: ' + req.body.name +
-//         ' with details: ' + req.body.description);
-// });
-
-// app.delete('/dishes/:dishId', (req, res, next) => {
-//     res.end('Deleting dish: ' + req.params.dishId);
-// });
-app.use('/dishes',dishRouter);
 const server = http.createServer(app);
 server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}/`)
-})
+    console.log(`Server running at http://${hostname}:${port}/`);
+});
