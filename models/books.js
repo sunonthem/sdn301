@@ -10,43 +10,62 @@ const commentSchema = new Schema({
 }, {
     timestamps: true
 })
-const dishSchema = new Schema({
-    name: {
+const genreSchema =new Schema({
+    genre:{type: mongoose.Schema.Types.ObjectId, ref:"Genre", require:true},
+    name:{
+        type:String, 
+        required:true,
+        unique:true
+    }
+},{
+    timestamps:true
+})
+const bookSchema = new Schema({
+    isbn:{
+        type: String,
+        required:true,
+    },
+    title: {
         type: String,
         required: true,
         unique: true
+    },
+    subTitle: {
+        type: String,
+        required: true
     },
     description: {
         type: String,
         require: true
     },
-    comments: [commentSchema],
-    image: {
+    publish_date: {
         type: String,
         required: true
     },
-    category: {
-        type: String,
-        required: true
-    },
-    label: {
+    publisher: {
         type: String,
         default: ''
     },
     price: {
-        type: Currency,
+        type: Number,
         required: true,
         min: 0
     },
-    featured: {
-        type: Boolean,
-        default: false
+    pages: {
+        type: Number,
+        required: true,
+        min: 0
     },
-
+    website: {
+        type: String,
+        require: true
+    },
+    comments: [commentSchema],
+    genre:[genreSchema]
     
     
 }, {
     timestamps: true
 });
-var Dishes = mongoose.model('dishs', dishSchema);
-module.exports = Dishes;
+var Books = mongoose.model('books', bookSchema);
+module.exports = Books;

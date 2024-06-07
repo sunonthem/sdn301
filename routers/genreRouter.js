@@ -1,46 +1,115 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const Genres = require("../models/genres");
+
 const genreRouter = express.Router();
+
 genreRouter.use(bodyParser.json());
-genreRouter.route('/')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
-    })
-    .get((req, res, next) => {
 
-        res.end('we have all genre for you');
+genreRouter
+    .route("/")
+    .get((req, res, next) => {
+        Genres.find({})
+            .then(
+                (genre) => {
+                    res.statusCode = 200;
+                    res.setHeader("Content-Type", "application/json");
+                    res.json(genre);
+                },
+                (err) => next(err)
+            )
+            .catch((err) => next(err));
     })
     .post((req, res, next) => {
-        res.end('here we go\n' + req.body.id+ '\n'+req.body.name );
+        Genres.create(req.body)
+            .then(
+                (genre) => {
+                    console.log("genre Created ", genre);
+                    res.statusCode = 200;
+                    res.setHeader("Content-Type", "application/json");
+                    res.json(genre);
+                },
+                (err) => next(err)
+            )
+            .catch((err) => next(err));
     })
-
     .put((req, res, next) => {
+        Genres.updateOne(req.body)
+            .then(
+                (genre) => {
+                    console.log("Update success", genre);
+                    res.statusCode = 200;
+                    res.setHeader("Content-Type", "application/json");
+                    res.json(genre);
+                },
+                (error) => next(error)
+            )
+            .catch((error) => next(error));
+        // res.statusCode = 403;
+        // res.end('PUT operation not supported on /Genres');
+    })
+    .delete((req, res, next) => {
+        Genres.remove({})
+            .then(
+                (resp) => {
+                    res.statusCode = 200;
+                    res.setHeader("Content-Type", "application/json");
+                    res.json(resp);
+                },
+                (err) => next(err)
+            )
+            .catch((err) => next(err));
+    });
+
+genreRouter
+    .route("/:GenresId")
+    .get((req, res, next) => {
+        Genres.findById(req.params.GenresId)
+            .then(
+                (genre) => {
+                    res.statusCode = 200;
+                    res.setHeader("Content-Type", "application/json");
+                    res.json(genre);
+                },
+                (err) => next(err)
+            )
+            .catch((err) => next(err));
+    })
+    .post((req, res, next) => {
         res.statusCode = 403;
-        res.end('PUT operation not supported on /genre');
-    })
-
-    .delete((req, res, next) => {
-        res.end('Deleting all genre');
-    })
-genreRouter.route('/:genresId')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
-    })
-    .get((req, res, next) => {
-        res.end('we have genre' + req.params.genresId + 'to you')
-    })
-    .post((req, res, next) => {
-        res.end('genre' + req.params.genresId + 'with name' + req.body.name)
+        res.end("POST operation not supported on /Genres/" + req.params.GenresId);
     })
     .put((req, res, next) => {
-        res.write('update genre ' + req.params.genresId + '\n')
-        res.end('Will update genre ' + req.params.genresId + ' with name ' + req.body.name)
+        Genres.findByIdAndUpdate(
+            req.params.GenresId,
+            {
+                $set: req.body,
+            },
+            { new: true }
+        )
+            .then(
+                (genre) => {
+                    res.statusCode = 200;
+                    res.setHeader("Content-Type", "application/json");
+                    res.json(genre);
+                },
+                (err) => next(err)
+            )
+            .catch((err) => next(err));
     })
     .delete((req, res, next) => {
-        res.end('Deleting genre: ' + req.params.genresId);
-    })
-module.exports= genreRouter;
+        Genres.findByIdAndRemove(req.params.GenresId)
+            .then(
+                (resp) => {
+                    res.statusCode = 200;
+                    res.setHeader("Content-Type", "application/json");
+                    res.json(resp);
+                },
+                (err) => next(err)
+            )
+            .catch((err) => next(err));
+    });
+
+
+module.exports = genreRouter;
