@@ -15,9 +15,9 @@ const hostname = 'localhost';
 const port = 5000;
 const app = express();
 var passport = require('passport');
-
+var config= require('./config')
 var authenticate = require('./authenticates');
-const url = 'mongodb://127.0.0.1:27017/conFusion';
+const url = config.mongoUrl;
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 const connect = mongoose.connect(url, {
